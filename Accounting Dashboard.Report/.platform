@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "Accounting Dashboard"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "61263c9c-405b-4508-b9c5-f911c1ebbf9b"
+  }
+}

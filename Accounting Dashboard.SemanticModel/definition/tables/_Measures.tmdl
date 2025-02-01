@@ -1,0 +1,951 @@
+table _Measures
+	lineageTag: e4863a20-5a55-4376-97dd-7b76c7a6f0ca
+
+	measure Placeholder = 0
+		formatString: 0
+		displayFolder: Supporting Measures
+		lineageTag: a3a78526-09e2-47a0-8e57-285b876c1db1
+
+	measure Updated_Until = TODAY()
+		formatString: General Date
+		displayFolder: Supporting Measures
+		lineageTag: aa8a8743-95f7-4d9c-bc82-d737a154a5e6
+
+	measure Last_Updated = 0
+		formatString: 0
+		displayFolder: Supporting Measures
+		lineageTag: 59f4179e-d76d-4f52-8ff0-7d0170aec891
+
+	measure Company_Name = "ABC Company LLC"
+		displayFolder: Supporting Measures
+		lineageTag: 04d009bf-392b-465a-ad03-3b887289148c
+
+	measure Expense = ```
+			
+			    SWITCH(
+			        SELECTEDVALUE(_CalculationPeriod[Period]),
+			        
+			        // Year-To-Date (YTD)
+			        "YTD", 
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                FILTER(
+			                    Accounts,
+			                    Accounts[AccountType] = "Expense"
+			                ),
+			                FILTER(
+			                    _CalendarTable,
+			                    _CalendarTable[Date] >= EOMONTH(TODAY(), - MONTH(TODAY())) + 1 && // From the first day of the current year
+			                    _CalendarTable[Date] <= EOMONTH(TODAY(), -1) // Until the last day of the previous month
+			                    )
+			                )
+			            ),
+			
+			        // Last 12 Months (L12M)
+			        "L12M", 
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                FILTER(
+			                    Accounts,
+			                    Accounts[AccountType] = "Expense"
+			                ),
+			                FILTER(
+			                    _CalendarTable,
+			                    _CalendarTable[Date] >= EOMONTH(TODAY(), -13) + 1 && // From the first day of the current year
+			                    _CalendarTable[Date] <= EOMONTH(TODAY(), -1) // Until the last day of the previous month
+			                    )
+			                )
+			            ),
+			        
+			        // Last 6 Months (L6M)
+			        "L6M", 
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                FILTER(
+			                    Accounts,
+			                    Accounts[AccountType] = "Expense"
+			                ),
+			                FILTER(
+			                    _CalendarTable,
+			                    _CalendarTable[Date] >= EOMONTH(TODAY(), -7) + 1 && // From the first day of the current year
+			                    _CalendarTable[Date] <= EOMONTH(TODAY(), -1) // Until the last day of the previous month
+			                    )
+			                )
+			            ),
+			        
+			        // Last 3 Months (L3M)
+			        "L3M",
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                FILTER(
+			                    Accounts,
+			                    Accounts[AccountType] = "Expense"
+			                ),
+			                FILTER(
+			                    _CalendarTable,
+			                    _CalendarTable[Date] >= EOMONTH(TODAY(), -4) + 1 && // From the first day of the current year
+			                    _CalendarTable[Date] <= EOMONTH(TODAY(), -1) // Until the last day of the previous month
+			                    )
+			                )
+			            ),
+			        
+			        0 // Default value if no selection
+			    )
+			
+			```
+		formatString: "€"\ #,0.00;-"€"\ #,0.00;"€"\ #,0.00
+		displayFolder: Dynamic Expense
+		lineageTag: 7572ab8b-5349-40a4-91cd-c2f3e5ce9e3a
+
+	measure NetIncome = [Income] - [Expense]
+		formatString: "€"\ #,0.00;-"€"\ #,0.00;"€"\ #,0.00
+		displayFolder: Dynamic Net Income
+		lineageTag: a287cc71-0bab-4b30-9299-60acfc9457f9
+
+	measure IncomeColumnTitle = ```
+			
+			    "Income for " &
+			    SWITCH(
+			        SELECTEDVALUE(_CalculationPeriod[Period], "Not Applicable"),
+			        "YTD", "Year to Date",
+			        "L12M", "Last 12 Months",
+			        "L6M", "Last 6 Months",
+			        "L3M", "Last 3 Months",
+			        "Not Applicable"
+			    )
+			
+			```
+		displayFolder: Dynamic Income
+		lineageTag: c7f1eb02-493b-4aa1-8a47-2e0bca1479c8
+
+	measure IncomeColumnSubTitle = ```
+			
+			    SWITCH(
+			        SELECTEDVALUE(_CalculationPeriod[Period]),
+			        
+			        // Last 12 Months (L12M)
+			        "L12M", 
+			        "Total: " & 
+			        FORMAT(
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                    FILTER(
+			                        Accounts,
+			                        Accounts[AccountType] = "Income"
+			                    ),
+			                    FILTER(
+			                        _CalendarTable,
+			                        _CalendarTable[Date] >= EOMONTH(TODAY(), -13) + 1 && // From 12 months ago
+			                        _CalendarTable[Date] <= EOMONTH(TODAY(), -1) // Until the last day of the previous month
+			                    )
+			                )
+			            ), 
+			            "€ #,##0.00"
+			        ) & 
+			        " | Average: " & 
+			        FORMAT(
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                    FILTER(
+			                        Accounts,
+			                        Accounts[AccountType] = "Income"
+			                    ),
+			                    FILTER(
+			                        _CalendarTable,
+			                        _CalendarTable[Date] >= EOMONTH(TODAY(), -13) + 1 && // From 12 months ago
+			                        _CalendarTable[Date] <= EOMONTH(TODAY(), -1) // Until the last day of the previous month
+			                    )
+			                )
+			            ) / 12, 
+			            "€ #,##0.00"
+			        ),
+			        
+			        // Last 6 Months (L6M)
+			        "L6M", 
+			        "Total: " & 
+			        FORMAT(
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                    FILTER(
+			                        Accounts,
+			                        Accounts[AccountType] = "Income"
+			                    ),
+			                    FILTER(
+			                        _CalendarTable,
+			                        _CalendarTable[Date] >= EOMONTH(TODAY(), -7) + 1 && // From 6 months ago
+			                        _CalendarTable[Date] <= EOMONTH(TODAY(), -1)
+			                    )
+			                )
+			            ), 
+			            "€ #,##0.00"
+			        ) & 
+			        " | Average: " & 
+			        FORMAT(
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                    FILTER(
+			                        Accounts,
+			                        Accounts[AccountType] = "Income"
+			                    ),
+			                    FILTER(
+			                        _CalendarTable,
+			                        _CalendarTable[Date] >= EOMONTH(TODAY(), -7) + 1 && // From 6 months ago
+			                        _CalendarTable[Date] <= EOMONTH(TODAY(), -1)
+			                    )
+			                )
+			            ) / 6, 
+			            "€ #,##0.00"
+			        ),
+			        
+			        // Last 3 Months (L3M)
+			        "L3M", 
+			        "Total: " & 
+			        FORMAT(
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                    FILTER(
+			                        Accounts,
+			                        Accounts[AccountType] = "Income"
+			                    ),
+			                    FILTER(
+			                        _CalendarTable,
+			                        _CalendarTable[Date] >= EOMONTH(TODAY(), -4) + 1 && // From 3 months ago
+			                        _CalendarTable[Date] <= EOMONTH(TODAY(), -1)
+			                    )
+			                )
+			            ), 
+			            "€ #,##0.00"
+			        ) & 
+			        " | Average: " & 
+			        FORMAT(
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                    FILTER(
+			                        Accounts,
+			                        Accounts[AccountType] = "Income"
+			                    ),
+			                    FILTER(
+			                        _CalendarTable,
+			                        _CalendarTable[Date] >= EOMONTH(TODAY(), -4) + 1 && // From 3 months ago
+			                        _CalendarTable[Date] <= EOMONTH(TODAY(), -1)
+			                    )
+			                )
+			            ) / 3, 
+			            "€ #,##0.00"
+			        ),
+			
+			        // Year-to-Date (YTD)
+			        "YTD", 
+			        "Total: " & 
+			        FORMAT(
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                    FILTER(
+			                        Accounts,
+			                        Accounts[AccountType] = "Income"
+			                    ),
+			                    FILTER(
+			                        _CalendarTable,
+			                        _CalendarTable[Date] >= DATE(YEAR(TODAY()), 1, 1) && // From the first day of the current year
+			                        _CalendarTable[Date] <= EOMONTH(TODAY(), -1) // Until the last day of the previous month
+			                    )
+			                )
+			            ), 
+			            "€ #,##0.00"
+			        ) & 
+			        " | Average: " & 
+			        FORMAT(
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                    FILTER(
+			                        Accounts,
+			                        Accounts[AccountType] = "Income"
+			                    ),
+			                    FILTER(
+			                        _CalendarTable,
+			                        _CalendarTable[Date] >= DATE(YEAR(TODAY()), 1, 1) && // From the first day of the current year
+			                        _CalendarTable[Date] <= EOMONTH(TODAY(), -1) // Until the last day of the previous month
+			                    )
+			                )
+			            ) / MONTH(TODAY() - 1), 
+			            "€ #,##0.00"
+			        ),
+			
+			        "Not Applicable"
+			    )
+			
+			```
+		displayFolder: Dynamic Income
+		lineageTag: 10ba487b-dd7a-4386-9daf-26b05d3df62f
+
+	measure IncomeDonutTitle = ```
+			
+			    "Income by type for " &
+			    SWITCH(
+			        SELECTEDVALUE(_CalculationPeriod[Period], "Not Applicable"),
+			        "YTD", "Year to Date",
+			        "L12M", "Last 12 Months",
+			        "L6M", "Last 6 Months",
+			        "L3M", "Last 3 Months",
+			        "Not Applicable"
+			    )
+			
+			```
+		displayFolder: Dynamic Income
+		lineageTag: 360b6ffa-5a6c-4ca5-80ac-14359fd9d209
+
+	measure NetAmount = [Income] - [Expense]
+		displayFolder: Dynamic Net Income
+		lineageTag: 21603761-27de-449c-a7b0-05978cfc2d08
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure ExpenseDecompositionTitle = ```
+			
+			    "Expense Decomposition for " &
+			    SWITCH(
+			        SELECTEDVALUE(_CalculationPeriod[Period], "Not Applicable"),
+			        "YTD", "Year to Date",
+			        "L12M", "Last 12 Months",
+			        "L6M", "Last 6 Months",
+			        "L3M", "Last 3 Months",
+			        "Not Applicable"
+			    )
+			
+			```
+		displayFolder: Dynamic Income
+		lineageTag: f4dd8077-8883-4dc3-bcf8-750a817358cf
+
+	measure NetMargin = ```
+			
+			    DIVIDE(
+			        [NetIncome],
+			        [Income]
+			    )
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Financial Ratios
+		lineageTag: 62fa6938-a9d4-4d9d-8f7f-d8ce9667701c
+
+	measure Income = ```
+			
+			    SWITCH(
+			        SELECTEDVALUE(_CalculationPeriod[Period]),
+			        
+			        // Year-To-Date (YTD)
+			        "YTD", 
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                FILTER(
+			                    Accounts,
+			                    Accounts[AccountType] = "Income"
+			                ),
+			                FILTER(
+			                    _CalendarTable,
+			                    _CalendarTable[Date] >= EOMONTH(TODAY(), - MONTH(TODAY())) + 1 && // From the first day of the current year
+			                    _CalendarTable[Date] <= EOMONTH(TODAY(), -1) // Until the last day of the previous month
+			                    )
+			                )
+			            ),
+			
+			        // Last 12 Months (L12M)
+			        "L12M", 
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                FILTER(
+			                    Accounts,
+			                    Accounts[AccountType] = "Income"
+			                ),
+			                FILTER(
+			                    _CalendarTable,
+			                    _CalendarTable[Date] >= EOMONTH(TODAY(), -13) + 1 && // From the first day of the current year
+			                    _CalendarTable[Date] <= EOMONTH(TODAY(), -1) // Until the last day of the previous month
+			                    )
+			                )
+			            ),
+			        
+			        // Last 6 Months (L6M)
+			        "L6M", 
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                FILTER(
+			                    Accounts,
+			                    Accounts[AccountType] = "Income"
+			                ),
+			                FILTER(
+			                    _CalendarTable,
+			                    _CalendarTable[Date] >= EOMONTH(TODAY(), -7) + 1 && // From the first day of the current year
+			                    _CalendarTable[Date] <= EOMONTH(TODAY(), -1) // Until the last day of the previous month
+			                    )
+			                )
+			            ),
+			        
+			        // Last 3 Months (L3M)
+			        "L3M",
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                FILTER(
+			                    Accounts,
+			                    Accounts[AccountType] = "Income"
+			                ),
+			                FILTER(
+			                    _CalendarTable,
+			                    _CalendarTable[Date] >= EOMONTH(TODAY(), -4) + 1 && // From the first day of the current year
+			                    _CalendarTable[Date] <= EOMONTH(TODAY(), -1) // Until the last day of the previous month
+			                    )
+			                )
+			            ),
+			        
+			        0 // Default value if no selection
+			    )
+			
+			```
+		formatString: "€"\ #,0.00;-"€"\ #,0.00;"€"\ #,0.00
+		displayFolder: Dynamic Income
+		lineageTag: 882e35ca-2527-406a-ae49-c8a10772a62a
+
+	measure Profit&LossWaterFallTitle = ```
+			
+			    "Profit & Loss for " &
+			    SWITCH(
+			        SELECTEDVALUE(_CalculationPeriod[Period], "Not Applicable"),
+			        "YTD", "Year to Date",
+			        "L12M", "Last 12 Months",
+			        "L6M", "Last 6 Months",
+			        "L3M", "Last 3 Months",
+			        "Not Applicable"
+			    )
+			
+			```
+		displayFolder: Dynamic Income
+		lineageTag: 6302bade-8dc3-4f8f-8ef7-519a0fce861f
+
+	measure IncomeDecompositionTitle = ```
+			
+			    "Income Decomposition for " &
+			    SWITCH(
+			        SELECTEDVALUE(_CalculationPeriod[Period], "Not Applicable"),
+			        "YTD", "Year to Date",
+			        "L12M", "Last 12 Months",
+			        "L6M", "Last 6 Months",
+			        "L3M", "Last 3 Months",
+			        "Not Applicable"
+			    )
+			
+			```
+		displayFolder: Dynamic Income
+		lineageTag: 8c856928-3aa1-495f-b013-3d06a485f45a
+
+	measure ExpenseColumnTitle = ```
+			
+			    "Expenses for " &
+			    SWITCH(
+			        SELECTEDVALUE(_CalculationPeriod[Period], "Not Applicable"),
+			        "YTD", "Year to Date",
+			        "L12M", "Last 12 Months",
+			        "L6M", "Last 6 Months",
+			        "L3M", "Last 3 Months",
+			        "Not Applicable"
+			    )
+			
+			```
+		displayFolder: Dynamic Expense
+		lineageTag: 1ad95604-849e-423c-b823-5aa3287a1c21
+
+	measure ExpenseColumnSubTitle = ```
+			
+			    SWITCH(
+			        SELECTEDVALUE(_CalculationPeriod[Period]),
+			        
+			        // Last 12 Months (L12M)
+			        "L12M", 
+			        "Total: " & 
+			        FORMAT(
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                    FILTER(
+			                        Accounts,
+			                        Accounts[AccountType] = "Expense"
+			                    ),
+			                    FILTER(
+			                        _CalendarTable,
+			                        _CalendarTable[Date] >= EOMONTH(TODAY(), -13) + 1 && // From 12 months ago
+			                        _CalendarTable[Date] <= EOMONTH(TODAY(), -1) // Until the last day of the previous month
+			                    )
+			                )
+			            ), 
+			            "€ #,##0.00"
+			        ) & 
+			        " | Average: " & 
+			        FORMAT(
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                    FILTER(
+			                        Accounts,
+			                        Accounts[AccountType] = "Expense"
+			                    ),
+			                    FILTER(
+			                        _CalendarTable,
+			                        _CalendarTable[Date] >= EOMONTH(TODAY(), -13) + 1 && // From 12 months ago
+			                        _CalendarTable[Date] <= EOMONTH(TODAY(), -1) // Until the last day of the previous month
+			                    )
+			                )
+			            ) / 12, 
+			            "€ #,##0.00"
+			        ),
+			        
+			        // Last 6 Months (L6M)
+			        "L6M", 
+			        "Total: " & 
+			        FORMAT(
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                    FILTER(
+			                        Accounts,
+			                        Accounts[AccountType] = "Expense"
+			                    ),
+			                    FILTER(
+			                        _CalendarTable,
+			                        _CalendarTable[Date] >= EOMONTH(TODAY(), -7) + 1 && // From 6 months ago
+			                        _CalendarTable[Date] <= EOMONTH(TODAY(), -1)
+			                    )
+			                )
+			            ), 
+			            "€ #,##0.00"
+			        ) & 
+			        " | Average: " & 
+			        FORMAT(
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                    FILTER(
+			                        Accounts,
+			                        Accounts[AccountType] = "Expense"
+			                    ),
+			                    FILTER(
+			                        _CalendarTable,
+			                        _CalendarTable[Date] >= EOMONTH(TODAY(), -7) + 1 && // From 6 months ago
+			                        _CalendarTable[Date] <= EOMONTH(TODAY(), -1)
+			                    )
+			                )
+			            ) / 6, 
+			            "€ #,##0.00"
+			        ),
+			        
+			        // Last 3 Months (L3M)
+			        "L3M", 
+			        "Total: " & 
+			        FORMAT(
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                    FILTER(
+			                        Accounts,
+			                        Accounts[AccountType] = "Expense"
+			                    ),
+			                    FILTER(
+			                        _CalendarTable,
+			                        _CalendarTable[Date] >= EOMONTH(TODAY(), -4) + 1 && // From 3 months ago
+			                        _CalendarTable[Date] <= EOMONTH(TODAY(), -1)
+			                    )
+			                )
+			            ), 
+			            "€ #,##0.00"
+			        ) & 
+			        " | Average: " & 
+			        FORMAT(
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                    FILTER(
+			                        Accounts,
+			                        Accounts[AccountType] = "Income"
+			                    ),
+			                    FILTER(
+			                        _CalendarTable,
+			                        _CalendarTable[Date] >= EOMONTH(TODAY(), -4) + 1 && // From 3 months ago
+			                        _CalendarTable[Date] <= EOMONTH(TODAY(), -1)
+			                    )
+			                )
+			            ) / 3, 
+			            "€ #,##0.00"
+			        ),
+			
+			        // Year-to-Date (YTD)
+			        "YTD", 
+			        "Total: " & 
+			        FORMAT(
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                    FILTER(
+			                        Accounts,
+			                        Accounts[AccountType] = "Income"
+			                    ),
+			                    FILTER(
+			                        _CalendarTable,
+			                        _CalendarTable[Date] >= DATE(YEAR(TODAY()), 1, 1) && // From the first day of the current year
+			                        _CalendarTable[Date] <= EOMONTH(TODAY(), -1) // Until the last day of the previous month
+			                    )
+			                )
+			            ), 
+			            "€ #,##0.00"
+			        ) & 
+			        " | Average: " & 
+			        FORMAT(
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                    FILTER(
+			                        Accounts,
+			                        Accounts[AccountType] = "Income"
+			                    ),
+			                    FILTER(
+			                        _CalendarTable,
+			                        _CalendarTable[Date] >= DATE(YEAR(TODAY()), 1, 1) && // From the first day of the current year
+			                        _CalendarTable[Date] <= EOMONTH(TODAY(), -1) // Until the last day of the previous month
+			                    )
+			                )
+			            ) / MONTH(TODAY() - 1), 
+			            "€ #,##0.00"
+			        ),
+			
+			        "Not Applicable"
+			    )
+			
+			```
+		displayFolder: Dynamic Expense
+		lineageTag: 21cdc2e8-60b1-4f30-8c3f-299f8e0e0a44
+
+	measure NetIncomeColumnTitle = ```
+			
+			    "Net Income for " &
+			    SWITCH(
+			        SELECTEDVALUE(_CalculationPeriod[Period], "Not Applicable"),
+			        "YTD", "Year to Date",
+			        "L12M", "Last 12 Months",
+			        "L6M", "Last 6 Months",
+			        "L3M", "Last 3 Months",
+			        "Not Applicable"
+			    )
+			
+			```
+		displayFolder: Dynamic Net Income
+		lineageTag: 8044a4c4-1772-4d4b-a409-3469949e2504
+
+	measure NetIncomeColumnSubTitle = ```
+			
+			    SWITCH(
+			        SELECTEDVALUE(_CalculationPeriod[Period]),
+			        
+			        // Last 12 Months (L12M)
+			        "L12M", 
+			        "Total: " & 
+			        FORMAT(
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                    FILTER(
+			                        Accounts,
+			                        Accounts[AccountType] = "Expense"
+			                    ),
+			                    FILTER(
+			                        _CalendarTable,
+			                        _CalendarTable[Date] >= EOMONTH(TODAY(), -13) + 1 && // From 12 months ago
+			                        _CalendarTable[Date] <= EOMONTH(TODAY(), -1) // Until the last day of the previous month
+			                    )
+			                )
+			            ), 
+			            "€ #,##0.00"
+			        ) & 
+			        " | Average: " & 
+			        FORMAT(
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                    FILTER(
+			                        Accounts,
+			                        Accounts[AccountType] = "Expense"
+			                    ),
+			                    FILTER(
+			                        _CalendarTable,
+			                        _CalendarTable[Date] >= EOMONTH(TODAY(), -13) + 1 && // From 12 months ago
+			                        _CalendarTable[Date] <= EOMONTH(TODAY(), -1) // Until the last day of the previous month
+			                    )
+			                )
+			            ) / 12, 
+			            "€ #,##0.00"
+			        ),
+			        
+			        // Last 6 Months (L6M)
+			        "L6M", 
+			        "Total: " & 
+			        FORMAT(
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                    FILTER(
+			                        Accounts,
+			                        Accounts[AccountType] = "Expense"
+			                    ),
+			                    FILTER(
+			                        _CalendarTable,
+			                        _CalendarTable[Date] >= EOMONTH(TODAY(), -7) + 1 && // From 6 months ago
+			                        _CalendarTable[Date] <= EOMONTH(TODAY(), -1)
+			                    )
+			                )
+			            ), 
+			            "€ #,##0.00"
+			        ) & 
+			        " | Average: " & 
+			        FORMAT(
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                    FILTER(
+			                        Accounts,
+			                        Accounts[AccountType] = "Expense"
+			                    ),
+			                    FILTER(
+			                        _CalendarTable,
+			                        _CalendarTable[Date] >= EOMONTH(TODAY(), -7) + 1 && // From 6 months ago
+			                        _CalendarTable[Date] <= EOMONTH(TODAY(), -1)
+			                    )
+			                )
+			            ) / 6, 
+			            "€ #,##0.00"
+			        ),
+			        
+			        // Last 3 Months (L3M)
+			        "L3M", 
+			        "Total: " & 
+			        FORMAT(
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                    FILTER(
+			                        Accounts,
+			                        Accounts[AccountType] = "Expense"
+			                    ),
+			                    FILTER(
+			                        _CalendarTable,
+			                        _CalendarTable[Date] >= EOMONTH(TODAY(), -4) + 1 && // From 3 months ago
+			                        _CalendarTable[Date] <= EOMONTH(TODAY(), -1)
+			                    )
+			                )
+			            ), 
+			            "€ #,##0.00"
+			        ) & 
+			        " | Average: " & 
+			        FORMAT(
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                    FILTER(
+			                        Accounts,
+			                        Accounts[AccountType] = "Income"
+			                    ),
+			                    FILTER(
+			                        _CalendarTable,
+			                        _CalendarTable[Date] >= EOMONTH(TODAY(), -4) + 1 && // From 3 months ago
+			                        _CalendarTable[Date] <= EOMONTH(TODAY(), -1)
+			                    )
+			                )
+			            ) / 3, 
+			            "€ #,##0.00"
+			        ),
+			
+			        // Year-to-Date (YTD)
+			        "YTD", 
+			        "Total: " & 
+			        FORMAT(
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                    FILTER(
+			                        Accounts,
+			                        Accounts[AccountType] = "Income"
+			                    ),
+			                    FILTER(
+			                        _CalendarTable,
+			                        _CalendarTable[Date] >= DATE(YEAR(TODAY()), 1, 1) && // From the first day of the current year
+			                        _CalendarTable[Date] <= EOMONTH(TODAY(), -1) // Until the last day of the previous month
+			                    )
+			                )
+			            ), 
+			            "€ #,##0.00"
+			        ) & 
+			        " | Average: " & 
+			        FORMAT(
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                    FILTER(
+			                        Accounts,
+			                        Accounts[AccountType] = "Income"
+			                    ),
+			                    FILTER(
+			                        _CalendarTable,
+			                        _CalendarTable[Date] >= DATE(YEAR(TODAY()), 1, 1) && // From the first day of the current year
+			                        _CalendarTable[Date] <= EOMONTH(TODAY(), -1) // Until the last day of the previous month
+			                    )
+			                )
+			            ) / MONTH(TODAY() - 1), 
+			            "€ #,##0.00"
+			        ),
+			
+			        "Not Applicable"
+			    )
+			
+			```
+		displayFolder: Dynamic Net Income
+		lineageTag: 6c0ad032-803c-471c-b1a1-0d5b1c18ad4a
+
+	measure ExpenseRibbonTitle = ```
+			
+			    "Top 5 Expense Categories for " &
+			    SWITCH(
+			        SELECTEDVALUE(_CalculationPeriod[Period], "Not Applicable"),
+			        "YTD", "Year to Date",
+			        "L12M", "Last 12 Months",
+			        "L6M", "Last 6 Months",
+			        "L3M", "Last 3 Months",
+			        "Not Applicable"
+			    )
+			
+			```
+		displayFolder: Dynamic Expense
+		lineageTag: 7be4069f-032e-44d2-94b4-460a8cac91e0
+
+	measure EBITDAMargin = -0.192
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Financial Ratios
+		lineageTag: 8aa83679-7ad2-494c-8514-92684a4758c9
+
+	measure GrossMargin = -0.283
+		formatString: 0.00%;-0.00%;0.00%
+		displayFolder: Financial Ratios
+		lineageTag: 239304b2-b456-413b-b7b2-130641dd80dd
+
+	measure AverageIncome = ```
+			
+			    SWITCH(
+			        SELECTEDVALUE(_CalculationPeriod[Period]),
+			        
+			        // Year-To-Date (YTD)
+			        "YTD", 
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                FILTER(
+			                    Accounts,
+			                    Accounts[AccountType] = "Income"
+			                ),
+			                FILTER(
+			                    _CalendarTable,
+			                    _CalendarTable[Date] >= EOMONTH(TODAY(), - MONTH(TODAY())) + 1 && // From the first day of the current year
+			                    _CalendarTable[Date] <= EOMONTH(TODAY(), -1) // Until the last day of the previous month
+			                    )
+			                )
+			            ),
+			
+			        // Last 12 Months (L12M)
+			        "L12M", 
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                FILTER(
+			                    Accounts,
+			                    Accounts[AccountType] = "Income"
+			                ),
+			                FILTER(
+			                    _CalendarTable,
+			                    _CalendarTable[Date] >= EOMONTH(TODAY(), -13) + 1 && // From the first day of the current year
+			                    _CalendarTable[Date] <= EOMONTH(TODAY(), -1) // Until the last day of the previous month
+			                    )
+			                )
+			            ) / 12,
+			        
+			        // Last 6 Months (L6M)
+			        "L6M", 
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                FILTER(
+			                    Accounts,
+			                    Accounts[AccountType] = "Income"
+			                ),
+			                FILTER(
+			                    _CalendarTable,
+			                    _CalendarTable[Date] >= EOMONTH(TODAY(), -7) + 1 && // From the first day of the current year
+			                    _CalendarTable[Date] <= EOMONTH(TODAY(), -1) // Until the last day of the previous month
+			                    )
+			                )
+			            ) / 6,
+			        
+			        // Last 3 Months (L3M)
+			        "L3M",
+			            ABS(
+			                CALCULATE(
+			                    SUM(Data[Debit]) - SUM(Data[Credit]),
+			                FILTER(
+			                    Accounts,
+			                    Accounts[AccountType] = "Income"
+			                ),
+			                FILTER(
+			                    _CalendarTable,
+			                    _CalendarTable[Date] >= EOMONTH(TODAY(), -4) + 1 && // From the first day of the current year
+			                    _CalendarTable[Date] <= EOMONTH(TODAY(), -1) // Until the last day of the previous month
+			                    )
+			                )
+			            ) / 3,
+			        
+			        0 // Default value if no selection
+			    )
+			
+			```
+		formatString: "€"\ #,0.00;-"€"\ #,0.00;"€"\ #,0.00
+		displayFolder: Dynamic Income
+		lineageTag: 4cc9a10a-603f-4fea-9d4f-616bd945312b
+
+	measure GrossProfit/Loss = 398292
+		formatString: "€"\ #,0;-"€"\ #,0;"€"\ #,0
+		displayFolder: Dynamic Net Income
+		lineageTag: e7aca17d-5998-498c-bfe9-49ed677e6a18
+
+	measure EBITDA$ = 02392
+		formatString: "€"\ #,0;-"€"\ #,0;"€"\ #,0
+		displayFolder: Dynamic Net Income
+		lineageTag: e58a146d-2e8f-4eba-b20e-ef9296a97422
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Column1 = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Column1"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+

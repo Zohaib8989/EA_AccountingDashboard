@@ -1,0 +1,232 @@
+table Accounts
+	lineageTag: 219a4ee9-fe52-48ee-b426-3ab3d545fe8d
+
+	column Account
+		dataType: string
+		lineageTag: 1e53bdd5-e013-4449-a908-1f70148adee0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: Data[Account]
+
+		annotation SummarizationSetBy = Automatic
+
+	column AccountType = ```
+			
+			    SWITCH(
+			        TRUE(),
+			        LEFT([Account], 1) = "1", "Assets",
+			        LEFT([Account], 1) = "2", "Not Applicable",
+			        LEFT([Account], 1) = "3", "Assets",
+			        LEFT([Account], 1) = "4", "Assets",
+			        LEFT([Account], 1) = "5", "Equity",
+			        LEFT([Account], 1) = "6", "Expense",
+			        LEFT([Account], 1) = "7", "Income",
+			        LEFT([Account], 1) = "8", "Not Applicable",
+			        LEFT([Account], 1) = "9", "Not Applicable",
+			        LEFT([Account], 1) = "71", "Sales",
+			        "Equity"
+			    )
+			
+			```
+		lineageTag: 5802a2af-80d0-402b-821c-46048d0abc8f
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column AccountCategory1 = ```
+			
+			    SWITCH(
+			        TRUE(),
+			        LEFT([Account], 2) = "61", "Bills", // Expense //
+			        LEFT([Account], 2) = "62", "External Suppliers and Services", // Expense //
+			        LEFT([Account], 2) = "63", "Personnel Expenses", // Expense //
+			        LEFT([Account], 2) = "64", "Depreciation and Amortization Expenses", // Expense //
+			        LEFT([Account], 2) = "65", "Impairment Losses", // Expense //
+			        LEFT([Account], 2) = "66", "Losses due to reductions in fair value", // Expense //
+			        LEFT([Account], 2) = "67", "Provisions for the period", // Expense //
+			        LEFT([Account], 2) = "68", "Other Expenses", // Expense //
+			        LEFT([Account], 2) = "69", "Financing Expenses", // Expense //
+			        LEFT([Account], 2) = "71", "Sales", // Income //
+			        LEFT([Account], 2) = "72", "Service provision", // Income //
+			        LEFT([Account], 2) = "73", "Variations in production inventories", // Income //
+			        LEFT([Account], 2) = "74", "Work for the entity itself", // Income //
+			        LEFT([Account], 2) = "75", "Operating subsidies", // Income //
+			        LEFT([Account], 2) = "76", "Reversals", // Income //
+			        LEFT([Account], 2) = "77", "Gains from increases in fair value", // Income //
+			        LEFT([Account], 2) = "78", "Other income", // Income //
+			        LEFT([Account], 2) = "72", "Interest, dividends and other similar income", // Income //
+			        "Not Applicable"
+			    )
+			
+			```
+		lineageTag: 3b29e23a-7305-4ba2-bb30-7876d46887fc
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column AccountCategory2 = ```
+			
+			    SWITCH(
+			        TRUE(),
+			
+			        // EXPENSES //
+			        // Bills //
+			        LEFT([Account], 3) = "611", "Goods",
+			        LEFT([Account], 3) = "612", "Raw, subsidiary and consumable materials",
+			        LEFT([Account], 3) = "613", "Biological assets (purchases)",
+			
+			        // External supplies and services //
+			        LEFT([Account], 3) = "621", "Subcontractors",
+			        LEFT([Account], 3) = "622", "Specialized Services",
+			        LEFT([Account], 3) = "623", "Materials",
+			        LEFT([Account], 3) = "624", "Energy and fluids",
+			        LEFT([Account], 3) = "625", "Travel, accomodation and transport",
+			        LEFT([Account], 3) = "626", "Various services",
+			
+			        // Personnel expenses//
+			        LEFT([Account], 3) = "631", "Remuneration of corporate bodies",
+			        LEFT([Account], 3) = "632", "Staff remuneration",
+			        LEFT([Account], 3) = "633", "Post-employement benefits",
+			        LEFT([Account], 3) = "634", "Compensation",
+			        LEFT([Account], 3) = "635", "Charges on remuneration",
+			        LEFT([Account], 3) = "636", "Insurance against accidents at work and occupational diseases",
+			        LEFT([Account], 3) = "637", "Social action expenses",
+			        LEFT([Account], 3) = "638", "Other personnel expenses",
+			
+			        // Depreciation and amortization expenses
+			        LEFT([Account], 3) = "661", "Investment properties",
+			        LEFT([Account], 3) = "642", "Tangible fixed assets",
+			        LEFT([Account], 3) = "643", "Intangible assets",
+			
+			        // Impairment losses //
+			        LEFT([Account], 3) = "651", "In debts receivable",
+			        LEFT([Account], 3) = "652", "In inventories",
+			        LEFT([Account], 3) = "653", "In financial investments",
+			        LEFT([Account], 3) = "654", "In investment properties",
+			        LEFT([Account], 3) = "655", "In tangible fixed assets",
+			        LEFT([Account], 3) = "656", "In intangible assets",
+			        LEFT([Account], 3) = "657", "In ongoing investments",
+			        LEFT([Account], 3) = "658", "In non-current assets held for sale",
+			
+			        // Losses due to reductions in fair value //
+			        LEFT([Account], 3) = "661", "In financial instruments",
+			        LEFT([Account], 3) = "662", "In financial Investments",
+			        LEFT([Account], 3) = "663", "In financial properties",
+			        LEFT([Account], 3) = "664", "In biological assets",
+			
+			        // Provisions for the period //
+			        LEFT([Account], 3) = "671", "Taxes",
+			        LEFT([Account], 3) = "672", "Customer guarantees",
+			        LEFT([Account], 3) = "673", "Ongoing legal proceedings",
+			        LEFT([Account], 3) = "674", "Accidents at work and occupational diseases",
+			        LEFT([Account], 3) = "675", "Environmental matters",
+			        LEFT([Account], 3) = "676", "Onerous contracts",
+			        LEFT([Account], 3) = "677", "Restructuring",
+			        LEFT([Account], 3) = "678", "Other provisions",
+			
+			        // Other Expenses //
+			        LEFT([Account], 3) = "681", "Taxes",
+			        LEFT([Account], 3) = "682", "Discounts for prompt payment granted",
+			        LEFT([Account], 3) = "683", "Bad debts",
+			        LEFT([Account], 3) = "684", "Inventory losses",
+			        LEFT([Account], 3) = "685", "Expenses ub subsidiaries, associates and joint ventures",
+			        LEFT([Account], 3) = "686", "Expenses on remaining financial investments",
+			        LEFT([Account], 3) = "687", "Expenditure on non-financial investments",
+			        LEFT([Account], 3) = "688", "Others",
+			
+			        // Financing expenses //
+			        LEFT([Account], 3) = "691", "Interest supported",
+			        LEFT([Account], 3) = "692", "Unfavorable exchange rate differences",
+			        LEFT([Account], 3) = "698", "Other financing expenses",
+			
+			        // INCOME //
+			        // Sales //
+			        LEFT([Account], 3) = "711", "Goods",
+			        LEFT([Account], 3) = "712", "Finished and intermediate products",
+			        LEFT([Account], 3) = "713", "By-products, waste, residues and scrap",
+			        LEFT([Account], 3) = "714", "Biological assets",
+			        LEFT([Account], 3) = "716", "VAT on sales tax included",
+			        LEFT([Account], 3) = "717", "Sales Returns",
+			        LEFT([Account], 3) = "718", "Discounts and rebates on sales",
+			
+			        //Service provisions //
+			        LEFT([Account], 3) = "721", "Service A",
+			        LEFT([Account], 3) = "722", "Service B",
+			        LEFT([Account], 3) = "725", "Secondary services",
+			        LEFT([Account], 3) = "726", "VAT on services with tax included",
+			        LEFT([Account], 3) = "728", "Discounts and rebates",
+			
+			        // Variations in production Inventories //
+			        LEFT([Account], 3) = "731", "Finished and intermediate products",
+			        LEFT([Account], 3) = "732", "By-products, waste, residues and scrap",
+			        LEFT([Account], 3) = "733", "Products and work in progress",
+			        LEFT([Account], 3) = "734", "Biological assets",
+			
+			        // Work for the entity itself //
+			        LEFT([Account], 3) = "741", "Tangible fixed assets",
+			        LEFT([Account], 3) = "742", "Intangible assets",
+			        LEFT([Account], 3) = "743", "Investment properties",
+			        LEFT([Account], 3) = "744", "Deferred expense assets",
+			
+			        // Operating subsidies //
+			        LEFT([Account], 3) = "751", "Subsidies from public entities",
+			        LEFT([Account], 3) = "752", "Grants from other entities",
+			
+			        // Reversals //
+			        LEFT([Account], 3) = "761", "Of depreciation and amortization",
+			        LEFT([Account], 3) = "762", "From impairment losses",
+			        LEFT([Account], 3) = "763", "Of provisions",
+			
+			        // Gains forom increases in fair value //
+			        LEFT([Account], 3) = "771", "In financial instruments",
+			        LEFT([Account], 3) = "772", "In financial investments",
+			        LEFT([Account], 3) = "773", "In investment properties",
+			        LEFT([Account], 3) = "774", "In biological assets",
+			
+			        // Other Income //
+			        LEFT([Account], 3) = "781", "Supplementary income",
+			        LEFT([Account], 3) = "782", "Discounts for prompt payment obtained",
+			        LEFT([Account], 3) = "783", "Recovery of receivables",
+			        LEFT([Account], 3) = "784", "Inventory gains",
+			        LEFT([Account], 3) = "785", "Income from subsidiaries, associates and joint ventures",
+			        LEFT([Account], 3) = "786", "Income from other financial assets",
+			        LEFT([Account], 3) = "787", "Income from non-financial investments",
+			        LEFT([Account], 3) = "788", "Others",
+			
+			        // Interest, dividends and other similar income //
+			        LEFT([Account], 3) = "791", "Interest earned",
+			        LEFT([Account], 3) = "792", "Dividend obtained",
+			        LEFT([Account], 3) = "793", "Favorable exchange rate differences",
+			        LEFT([Account], 3) = "798", "Other similar income",
+			
+			
+			        "Not Applicable"
+			    )
+			
+			```
+		lineageTag: 87110d49-d339-4b9e-97bd-031a48eb8d1a
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column AccountTypeSort = ```
+			
+			    SWITCH(
+			        TRUE(),
+			        Accounts[AccountType] = "Income", 1,
+			        Accounts[AccountType] = "Expense", 2,
+			        0
+			    )
+			```
+		formatString: 0
+		lineageTag: f2d44f23-4cdb-4072-86db-527bcc3bd7dd
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Accounts = calculated
+		mode: import
+		source = DISTINCT(Data[Account])
+
+	annotation PBI_Id = f96f3843f2f8425b955e346314c45ffe
+

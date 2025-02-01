@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "Accounting Dashboard"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "44f74782-81e5-4ad4-9124-ff91d66ae8e7"
+  }
+}

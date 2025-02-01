@@ -1,0 +1,20 @@
+relationship 328238f5-19e5-4e0e-9b93-64ea98f93355
+	joinOnDateBehavior: datePartOnly
+	fromColumn: _CalendarTable.Date
+	toColumn: LocalDateTable_febfb33e-5cdb-4198-b368-790cede113c1.Date
+
+relationship c498dae7-7058-4b58-b111-59c8ca1dffe5
+	joinOnDateBehavior: datePartOnly
+	fromColumn: Data.'Document date'
+	toColumn: LocalDateTable_8565947a-26a2-42cb-9f90-bdfdd43a914d.Date
+
+relationship 9e6e8c6f-d051-e1c1-cabe-159b6dad0aae
+	crossFilteringBehavior: bothDirections
+	fromColumn: Data.'Release date'
+	toColumn: _CalendarTable.Date
+
+relationship b3c2f52d-3826-04a3-b22f-dde89acb24c5
+	crossFilteringBehavior: bothDirections
+	fromColumn: Data.Account
+	toColumn: Accounts.Account
+

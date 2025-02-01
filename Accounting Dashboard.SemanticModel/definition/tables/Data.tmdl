@@ -1,0 +1,179 @@
+table Data
+	lineageTag: 03941d40-1596-4cae-86b0-558cb594be0d
+
+	column Account
+		dataType: string
+		lineageTag: 6939aad8-2e26-4cb8-93e0-3622695d4eec
+		summarizeBy: none
+		sourceColumn: Account
+
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Account Description'
+		dataType: string
+		lineageTag: 7c6b2a08-b04f-4c9a-b1b7-98afda20e8a0
+		summarizeBy: none
+		sourceColumn: Account Description
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Release date'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 25ebbcb6-f9bd-4304-94d1-fc005efa7c36
+		summarizeBy: none
+		sourceColumn: Release date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Release Type'
+		dataType: string
+		lineageTag: a868826e-788a-440d-88f5-f03a3f690cbf
+		summarizeBy: none
+		sourceColumn: Release Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Accounting document'
+		dataType: string
+		lineageTag: 862c9afe-a1bc-4411-8b1c-6c2d07f05d9a
+		summarizeBy: none
+		sourceColumn: Accounting document
+
+		annotation SummarizationSetBy = Automatic
+
+	column Daily
+		dataType: string
+		lineageTag: 03acf9eb-3f22-425a-b4bc-0bed91ad5c75
+		summarizeBy: none
+		sourceColumn: Daily
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Journal number'
+		dataType: string
+		lineageTag: 14b75f1d-10ef-495d-a93d-ac39942449fd
+		summarizeBy: none
+		sourceColumn: Journal number
+
+		annotation SummarizationSetBy = Automatic
+
+	column Description
+		dataType: string
+		lineageTag: 6bba5867-6ee6-463c-8533-5e051c2dcb3c
+		summarizeBy: none
+		sourceColumn: Description
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Commercial Document'
+		dataType: string
+		lineageTag: 9b0d371e-a06e-42ec-a599-a1cd1eb657d4
+		summarizeBy: none
+		sourceColumn: Commercial Document
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Your Ref.'
+		dataType: string
+		lineageTag: 65043bf0-f4d1-462c-8afb-ed38571f06bd
+		summarizeBy: none
+		sourceColumn: Your Ref.
+
+		annotation SummarizationSetBy = Automatic
+
+	column Debit
+		dataType: double
+		lineageTag: 52affc27-4377-423d-b360-a529d8457b13
+		summarizeBy: sum
+		sourceColumn: Debit
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Credit
+		dataType: double
+		lineageTag: beef5247-b4ee-4ef4-82e2-17f2ef3ccbf2
+		summarizeBy: sum
+		sourceColumn: Credit
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Movement
+		dataType: double
+		lineageTag: e577946c-633d-4a73-8353-260134d7853c
+		summarizeBy: sum
+		sourceColumn: Movement
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column Balance
+		dataType: double
+		lineageTag: 2a8ab2d0-abec-47b9-af9d-39a0a9b6bb1b
+		summarizeBy: sum
+		sourceColumn: Balance
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Document date'
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 28dae20d-3ccb-436e-a3b3-3ad0ff734747
+		summarizeBy: none
+		sourceColumn: Document date
+
+		variation Variation
+			isDefault
+			relationship: c498dae7-7058-4b58-b111-59c8ca1dffe5
+			defaultHierarchy: LocalDateTable_8565947a-26a2-42cb-9f90-bdfdd43a914d.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column 'Third party name'
+		dataType: string
+		lineageTag: 9f86b5d6-24f4-4714-8b7a-f0ba1139d971
+		summarizeBy: none
+		sourceColumn: Third party name
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'NIF of the third party'
+		dataType: string
+		lineageTag: c3e35e70-281b-4069-b415-cb148700c52e
+		summarizeBy: none
+		sourceColumn: NIF of the third party
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Data = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("C:\Users\zohai\OneDrive\Projects\Elevate Accounting\src\Data\extratocontas_EN.xlsx"), null, true),
+				    #" Data_Sheet" = Source{[Item=" Data",Kind="Sheet"]}[Data],
+				    #"Promoted Headers" = Table.PromoteHeaders(#" Data_Sheet", [PromoteAllScalars=true]),
+				    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"517899264 - MODERNIZE BUSINESS EXPERTS UNIPESSOAL LDA", type text}, {"Column2", type text}, {"Column3", type text}, {"Column4", type text}, {"Column5", type text}, {"Column6", type text}, {"Column7", type text}, {"Column8", type text}, {"Column9", type text}, {"Column10", type text}, {"Column11", type any}, {"Column12", type any}, {"Column13", type any}, {"Column14", type any}, {"Column15", type text}, {"Column16", type text}, {"Column17", type text}}),
+				    #"Removed Top Rows" = Table.Skip(#"Changed Type",5),
+				    #"Promoted Headers1" = Table.PromoteHeaders(#"Removed Top Rows", [PromoteAllScalars=true]),
+				    #"Changed Type1" = Table.TransformColumnTypes(#"Promoted Headers1",{{"Account", Int64.Type}, {"Account Description", type text}, {"Release date", type date}, {"Release Type", type text}, {"Accounting document", type text}, {"Daily", type text}, {"Journal number", type text}, {"Description", type text}, {"Commercial Document", type text}, {"Your Ref.", type text}, {"Debit", type number}, {"Credit", type number}, {"Movement", type number}, {"Balance", type number}, {"Document date", type date}, {"Third party name", type text}, {"NIF of the third party", type text}}),
+				    #"Filtered Rows" = Table.SelectRows(#"Changed Type1", each ([Release date] <> null))
+				in
+				    #"Filtered Rows"
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+
